@@ -39,3 +39,12 @@
 
 # debug information files
 *.dwo
+
+# CLion, build, and VsCode stuff
+build
+cmake-build-*
+.idea
+*.txt
+!CMakeLists.txt
+.DS_Store
+.vscode
