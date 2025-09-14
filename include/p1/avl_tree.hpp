@@ -20,83 +20,71 @@ public:
     };
 
 public:
-    AVlTree() = default;
-    ~AVlTree() {
-        FreeNode(Root_);
-    }
-
-    void Insert(const K& key, const V& value) {
-        Root_ = InsertInternal(Root_, key, value);
-    }
-
-    // For now, we assume that the key MUST be in the tree
-    // If it isn't in the tree, we just throw an error
-    V& Get(const K& key) {
-        return GetInternal(Root_, key);
-    }
-
-    // Helper function to print the tree
-    void PrintAVlTree() const {
-        PrintAVlTreeInternal("", Root_, false);
-    }
-
-private:
-    static void FreeNode(AVlNode* Root) {
-        if (!Root) {
-            return;
-        }
-
-        FreeNode(Root->Left_);
-        FreeNode(Root->Right_);
-        delete Root;
-    }
-
-    static void PrintAVlTreeInternal(const std::string& Prefix, AVlNode* Root, bool isLeft) {
+    static void PrintAVlTree(AVlNode* Root, const std::string& Prefix = "", bool isLeft = false) {
         // Nice way of printing a tree
         // https://stackoverflow.com/questions/36802354/print-binary-tree-in-a-pretty-way-using-c
         if (Root) {
             std::cout << Prefix;
             std::cout << (isLeft ? "├──" : "└──");
             std::cout << Root->Key_ << std::endl;
-            PrintAVlTreeInternal( Prefix + (isLeft ? "│   " : "    "), Root->Left_, true);
-            PrintAVlTreeInternal( Prefix + (isLeft ? "│   " : "    "), Root->Right_, false);
+            PrintAVlTree(Root->Left_, Prefix + (isLeft ? "│   " : "    "), true);
+            PrintAVlTree(Root->Right_, Prefix + (isLeft ? "│   " : "    "), false);
         }
     }
 
 
-    static V& GetInternal(AVlNode* Root, const K& key) {
-        if (!Root) {
+    static V& GetValue(AVlNode* Root, const K& key) {
+        if (Root == nullptr) {
             throw std::runtime_error("Could not find provided key in AVL Tree");
         }
 
         if (Root->Key_ > key) {
-            return GetInternal(Root->Left_, key);
+            return GetValue(Root->Left_, key);
         }
         if (Root->Key_ < key) {
-            return GetInternal(Root->Right_, key);
+            return GetValue(Root->Right_, key);
         }
         return Root->Value_;
     }
 
-    static AVlNode* InsertInternal(AVlNode* Root, const K& Key, const V& Value) {
-        if (!Root) {
+    static AVlNode* InsertKey(AVlNode* Root, const K& Key, const V& Value) {
+        if (Root == nullptr) {
             Root = new AVlNode(Key, Value);
             return Root;
         }
 
         // We shouldn't have duplicate keys, but we just add them to the left if it happens (according to handout)
         if (Key <= Root->Key_) {
-            Root->Left_ = InsertInternal(Root->Left_, Key, Value);
+            Root->Left_ = InsertKey(Root->Left_, Key, Value);
         } else {
-            Root->Right_ = InsertInternal(Root->Right_, Key, Value);
+            Root->Right_ = InsertKey(Root->Right_, Key, Value);
         }
 
         // Recalculate the height of the Root
         Root->Height_ = 1 + std::max(GetHeight(Root->Left_), GetHeight(Root->Right_));
 
         return Rebalance(Root);
-    };
+    }
 
+    static void FreeAVLTree(AVlNode* Root) {
+        if (Root == nullptr) {
+            return;
+        }
+
+        FreeAVLTree(Root->Left_);
+        FreeAVLTree(Root->Right_);
+        delete Root;
+    }
+
+    // Get the height of the AvlTree rooted at Root
+    static int GetHeight(AVlNode* Root) {
+        if (Root) {
+            return Root->Height_;
+        }
+        return 0;
+    }
+
+private:
     static AVlNode* Rebalance(AVlNode* Root) {
         assert(Root);
         int balance = GetHeight(Root->Left_) - GetHeight(Root->Right_);
@@ -164,17 +152,6 @@ private:
 
         return returnNode;
     }
-
-    // Get the height of the AvlTree rooted at Root
-    static int GetHeight(AVlNode* Root) {
-        if (Root) {
-            return Root->Height_;
-        }
-        return 0;
-    }
-
-private:
-    AVlNode* Root_;
 };
 
 }
