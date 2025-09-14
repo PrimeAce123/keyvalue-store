@@ -21,6 +21,10 @@ public:
 
 public:
     AVlTree() = default;
+    ~AVlTree() {
+        FreeNode(Root_);
+    }
+
     void Insert(const K& key, const V& value) {
         Root_ = InsertInternal(Root_, key, value);
     }
@@ -32,30 +36,34 @@ public:
     }
 
     // Helper function to print the tree
-    void PrintAVlTree() {
-        if (!Root_) {
-            std::cout << "Empty AVlTree" << std::endl;
-            return;
-        }
-
-        std::queue<AVlNode*> nodes;
-        nodes.push(Root_);
-        while (!nodes.empty()) {
-            auto currNode = nodes.front();
-            nodes.pop();
-            std::cout << currNode->Key_ << " ";
-            if (currNode->Left_) {
-                nodes.push(currNode->Left_);
-            }
-
-            if (currNode->Right_) {
-                nodes.push(currNode->Right_);
-            }
-        }
-        std::cout << std::endl;
+    void PrintAVlTree() const {
+        PrintAVlTreeInternal("", Root_, false);
     }
 
 private:
+    static void FreeNode(AVlNode* Root) {
+        if (!Root) {
+            return;
+        }
+
+        FreeNode(Root->Left_);
+        FreeNode(Root->Right_);
+        delete Root;
+    }
+
+    static void PrintAVlTreeInternal(const std::string& Prefix, AVlNode* Root, bool isLeft) {
+        // Nice way of printing a tree
+        // https://stackoverflow.com/questions/36802354/print-binary-tree-in-a-pretty-way-using-c
+        if (Root) {
+            std::cout << Prefix;
+            std::cout << (isLeft ? "├──" : "└──");
+            std::cout << Root->Key_ << std::endl;
+            PrintAVlTreeInternal( Prefix + (isLeft ? "│   " : "    "), Root->Left_, true);
+            PrintAVlTreeInternal( Prefix + (isLeft ? "│   " : "    "), Root->Right_, false);
+        }
+    }
+
+
     static V& GetInternal(AVlNode* Root, const K& key) {
         if (!Root) {
             throw std::runtime_error("Could not find provided key in AVL Tree");
