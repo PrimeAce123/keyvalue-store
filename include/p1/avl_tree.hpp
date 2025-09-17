@@ -19,7 +19,70 @@ public:
         int Height_{};
     };
 
-public:
+    AVLTree() : Root_(nullptr), Size_(0), TotalDataSize_(0) {}
+    
+    ~AVLTree() {
+        FreeAVLTree(Root_);
+    }
+
+    void Put(const K& key, const V& value) {
+        size_t oldSize = GetDataSize(key, value);
+        Root_ = InsertKey(Root_, key, value);
+        Size_++;
+        TotalDataSize_ += oldSize;
+    }
+
+    V& Get(const K& key) {
+        return GetValue(Root_, key);
+    }
+
+    std::vector<std::pair<K, V>> Scan(const K& key1, const K& key2) {
+        std::vector<std::pair<K, V>> result;
+        InOrderTraversal(Root_, [&](const K& key, const V& value) {
+            if (key >= key1 && key <= key2) {
+                result.emplace_back(key, value);
+            }
+            return key <= key2;
+        });
+        return result;
+    }
+
+    void InOrderTraversal(std::function<bool(const K&, const V&)> callback) {
+        InOrderTraversal(Root_, callback);
+    }
+
+    size_t GetSize() const {
+        return Size_;
+    }
+
+    size_t GetTotalDataSize() const {
+        return TotalDataSize_;
+    }
+
+    bool IsEmpty() const {
+        return Root_ == nullptr;
+    }
+
+    void Clear() {
+        FreeAVLTree(Root_);
+        Root_ = nullptr;
+        Size_ = 0;
+        TotalDataSize_ = 0;
+    }
+
+    void PrintTree() const {
+        PrintAVLTree(Root_);
+    }
+
+private:
+    AVlNode* Root_;
+    size_t Size_;
+    size_t TotalDataSize_;
+
+    size_t GetDataSize(const K& key, const V& value) const {
+        return sizeof(K) + sizeof(V);
+    }
+
     static void PrintAVlTree(AVlNode* Root, const std::string& Prefix = "", bool isLeft = false) {
         // Nice way of printing a tree
         // https://stackoverflow.com/questions/36802354/print-binary-tree-in-a-pretty-way-using-c
@@ -84,7 +147,21 @@ public:
         return 0;
     }
 
-private:
+    // In-order traversal of the AVL tree
+    static void InOrderTraversal(AVLNode* Root, std::function<bool(const K&, const V&)> callback) {
+        if (Root == nullptr) {
+            return;
+        }
+        
+        InOrderTraversal(Root->Left_, callback);
+        
+        if (!callback(Root->Key_, Root->Value_)) {
+            return;
+        }
+        
+        InOrderTraversal(Root->Right_, callback);
+    }
+
     static AVlNode* Rebalance(AVlNode* Root) {
         assert(Root);
         int balance = GetHeight(Root->Left_) - GetHeight(Root->Right_);
