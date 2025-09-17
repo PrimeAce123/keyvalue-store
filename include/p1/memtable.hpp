@@ -1,6 +1,7 @@
 #pragma once
 
 #include "avl_tree.hpp"
+
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -83,7 +84,7 @@ public:
     }
 
 private:
-    AVlTree<K, V> tree_;          
+    AVLTree<K, V> tree_;
     const size_t size_limit_;    
     size_t current_size_;
 
