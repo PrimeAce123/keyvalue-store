@@ -7,15 +7,15 @@
 namespace p1 {
 
 template <typename K, typename V>
-class AVlTree {
+class AVLTree {
 public:
-    struct AVlNode {
-        AVlNode() = default;
-        AVlNode(const K& Key, const V& Value) : Key_(Key), Value_(Value), Height_(1) {}
+    struct AVLNode {
+        AVLNode() = default;
+        AVLNode(const K& Key, const V& Value) : Key_(Key), Value_(Value), Height_(1) {}
         K Key_;
         V Value_;
-        AVlNode* Left_{};
-        AVlNode* Right_{};
+        AVLNode* Left_{};
+        AVLNode* Right_{};
         int Height_{};
     };
 
@@ -75,7 +75,7 @@ public:
     }
 
 private:
-    AVlNode* Root_;
+    AVLNode* Root_;
     size_t Size_;
     size_t TotalDataSize_;
 
@@ -83,7 +83,7 @@ private:
         return sizeof(K) + sizeof(V);
     }
 
-    static void PrintAVlTree(AVlNode* Root, const std::string& Prefix = "", bool isLeft = false) {
+    static void PrintAVlTree(AVLNode* Root, const std::string& Prefix = "", bool isLeft = false) {
         // Nice way of printing a tree
         // https://stackoverflow.com/questions/36802354/print-binary-tree-in-a-pretty-way-using-c
         if (Root) {
@@ -96,7 +96,7 @@ private:
     }
 
 
-    static V& GetValue(AVlNode* Root, const K& key) {
+    static V& GetValue(AVLNode* Root, const K& key) {
         if (Root == nullptr) {
             throw std::runtime_error("Could not find provided key in AVL Tree");
         }
@@ -110,9 +110,9 @@ private:
         return Root->Value_;
     }
 
-    static AVlNode* InsertKey(AVlNode* Root, const K& Key, const V& Value) {
+    static AVLNode* InsertKey(AVLNode* Root, const K& Key, const V& Value) {
         if (Root == nullptr) {
-            Root = new AVlNode(Key, Value);
+            Root = new AVLNode(Key, Value);
             return Root;
         }
 
@@ -129,7 +129,7 @@ private:
         return Rebalance(Root);
     }
 
-    static void FreeAVLTree(AVlNode* Root) {
+    static void FreeAVLTree(AVLNode* Root) {
         if (Root == nullptr) {
             return;
         }
@@ -140,7 +140,7 @@ private:
     }
 
     // Get the height of the AvlTree rooted at Root
-    static int GetHeight(AVlNode* Root) {
+    static int GetHeight(AVLNode* Root) {
         if (Root) {
             return Root->Height_;
         }
@@ -162,7 +162,7 @@ private:
         InOrderTraversal(Root->Right_, callback);
     }
 
-    static AVlNode* Rebalance(AVlNode* Root) {
+    static AVLNode* Rebalance(AVLNode* Root) {
         assert(Root);
         int balance = GetHeight(Root->Left_) - GetHeight(Root->Right_);
         if (balance > 1) {
@@ -202,9 +202,9 @@ private:
 
     // We don't do any safety checking for these functions
     // It is up to the caller that the rotation is called correctly on a particular AvlNode
-    static AVlNode* LeftRotate(AVlNode* Root) {
+    static AVLNode* LeftRotate(AVLNode* Root) {
         // This is the exact inverse of RotateRight
-        AVlNode* returnNode = Root->Right_;
+        AVLNode* returnNode = Root->Right_;
         Root->Right_ = returnNode->Left_;
         returnNode->Left_ = Root;
 
@@ -217,9 +217,9 @@ private:
         return returnNode;
     }
 
-    static AVlNode* RightRotate(AVlNode* Root) {
+    static AVLNode* RightRotate(AVLNode* Root) {
         // Reassign the nodes
-        AVlNode* returnNode = Root->Left_;
+        AVLNode* returnNode = Root->Left_;
         Root->Left_ = returnNode->Right_;
         returnNode->Right_ = Root;
 
