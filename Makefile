@@ -1,6 +1,10 @@
-.PHONY: all clean
+.PHONY: all clean test
 
 all: release debug
+
+test: debug
+	@echo "Running tests..."
+	./build/debug/test/tests
 
 # Add any new CMAKE_VARS here
 CMAKE_VARS:= -DDEBUG_LOGGING=1 $\
