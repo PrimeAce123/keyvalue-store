@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <cassert>
 #include <iostream>
+#include <functional>
+#include <vector>
 
 namespace p1 {
 
@@ -36,6 +38,10 @@ public:
         return GetValue(Root_, key);
     }
 
+    const V& Get(const K& key) const {
+        return GetValue(Root_, key);
+    }
+
     std::vector<std::pair<K, V>> Scan(const K& key1, const K& key2) {
         std::vector<std::pair<K, V>> result;
         InOrderTraversal(Root_, [&](const K& key, const V& value) {
@@ -47,7 +53,22 @@ public:
         return result;
     }
 
+    std::vector<std::pair<K, V>> Scan(const K& key1, const K& key2) const {
+        std::vector<std::pair<K, V>> result;
+        InOrderTraversal(Root_, [&](const K& key, const V& value) {
+            if (key >= key1 && key <= key2) {
+                result.emplace_back(key, value);
+            }
+            return key <= key2;
+        });
+        return result;
+    }
+
     void InOrderTraversal(std::function<bool(const K&, const V&)> callback) {
+        InOrderTraversal(Root_, callback);
+    }
+
+    void InOrderTraversal(std::function<bool(const K&, const V&)> callback) const {
         InOrderTraversal(Root_, callback);
     }
 
@@ -110,6 +131,20 @@ private:
         return Root->Value_;
     }
 
+    static const V& GetValue(const AVLNode* Root, const K& key) {
+        if (Root == nullptr) {
+            throw std::runtime_error("Could not find provided key in AVL Tree");
+        }
+
+        if (Root->Key_ > key) {
+            return GetValue(Root->Left_, key);
+        }
+        if (Root->Key_ < key) {
+            return GetValue(Root->Right_, key);
+        }
+        return Root->Value_;
+    }
+
     static AVLNode* InsertKey(AVLNode* Root, const K& Key, const V& Value) {
         if (Root == nullptr) {
             Root = new AVLNode(Key, Value);
@@ -149,6 +184,20 @@ private:
 
     // In-order traversal of the AVL tree
     static void InOrderTraversal(AVLNode* Root, std::function<bool(const K&, const V&)> callback) {
+        if (Root == nullptr) {
+            return;
+        }
+        
+        InOrderTraversal(Root->Left_, callback);
+        
+        if (!callback(Root->Key_, Root->Value_)) {
+            return;
+        }
+        
+        InOrderTraversal(Root->Right_, callback);
+    }
+
+    static void InOrderTraversal(const AVLNode* Root, std::function<bool(const K&, const V&)> callback) {
         if (Root == nullptr) {
             return;
         }

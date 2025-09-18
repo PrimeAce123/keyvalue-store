@@ -26,19 +26,19 @@ public:
         }
 
         // Insert into AVL tree
-        tree_.InsertKey(key, value);
+        tree_.Put(key, value);
         current_size_ += entry_size;
         return true;
     }
 
     // Get a value by key
     V Get(const K& key) const {
-        return tree_.GetValue(key);
+        return tree_.Get(key);
     }
 
     // Scan for all key-value pairs in range [key1, key2]
     std::vector<std::pair<K, V>> Scan(const K& key1, const K& key2) const {
-        return tree_.RangeQuery(key1, key2);
+        return tree_.Scan(key1, key2);
     }
 
     size_t GetCurrentSize() const {
